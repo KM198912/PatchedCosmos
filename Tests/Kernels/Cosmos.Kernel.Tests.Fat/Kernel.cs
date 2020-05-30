@@ -1,59 +1,65 @@
 ﻿using System;
-
-using Cosmos.System.FileSystem;
-using Cosmos.System.FileSystem.VFS;
-using Cosmos.TestRunner;
+using System.Collections.Generic;
+using System.Drawing;
+using System.Text;
+using Cosmos.HAL;
+using Cosmos.System.Graphics;
+using ColorDepth = Cosmos.System.Graphics.ColorDepth;
 using Sys = Cosmos.System;
-using Cosmos.Kernel.Tests.Fat.System.IO;
-using System.IO;
+//using VGATest.GUI;
+using Point = Cosmos.System.Graphics.Point;
 
-namespace Cosmos.Kernel.Tests.Fat
+namespace VGATest
 {
-    /// <summary>
-    /// The kernel implementation.
-    /// </summary>
-    /// <seealso cref="Cosmos.System.Kernel" />
     public class Kernel : Sys.Kernel
     {
-        private VFSBase mVFS;
-
-        /// <summary>
-        /// Pre-run events
-        /// </summary>
+        public static Canvas canvas;
+        Pen pen;
         protected override void BeforeRun()
         {
-            Console.WriteLine("Cosmos booted successfully, now start testing");
-            mVFS = new CosmosVFS();
-            VFSManager.RegisterVFS(mVFS);
+            pen = new Pen(Color.Red);
+            canvas = new VGACanvas(new Mode(720, 480, ColorDepth.ColorDepth4));
+            canvas.Clear(Color.GhostWhite);
+            Sys.MouseManager.ScreenWidth = (uint)canvas.Mode.Columns;
+            Sys.MouseManager.ScreenHeight = (uint)canvas.Mode.Rows;
         }
 
-        /// <summary>
-        /// Main kernel loop
-        /// </summary>
         protected override void Run()
         {
             try
             {
-                mDebugger.Send("Run");
 
-                PathTest.Execute(mDebugger);
-                DirectoryTest.Execute(mDebugger);
-                FileStreamTest.Execute(mDebugger);
-                DirectoryInfoTest.Execute(mDebugger);
-                StreamWriterStreamReaderTest.Execute(mDebugger);
-                BinaryWriterBinaryReaderTest.Execute(mDebugger);
-                FileInfoTest.Execute(mDebugger);
-                DriveInfoTest.Execute(mDebugger);
-                FileTest.Execute(mDebugger);
-                
-                TestController.Completed();
+                uint X = Sys.MouseManager.X;
+                uint Y = Sys.MouseManager.Y;
+                // canvas.DrawFilledRectangle(pen, (int)X, (int)Y,7,7);
+                /* pen.Color = Color.GhostWhite;
+                 canvas.DrawFilledRectangle(pen,(int)X, (int)Y, 40, 40);
+                 pen.Color = Color.Red;
+                 Point cur = new Point((int)Sys.MouseManager.X, (int)Sys.MouseManager.Y);
+                 canvas.DrawLine(pen, cur, new Point(cur.X, cur.Y + 14));
+                 canvas.DrawLine(pen, new Point(cur.X + 1, cur.Y + 1), new Point(cur.X + 10, cur.Y + 10));
+                 canvas.DrawLine(pen, new Point(cur.X + 6, cur.Y + 10), new Point(cur.X + 10, cur.Y + 10));
+                 canvas.DrawLine(pen, new Point(cur.X + 1, cur.Y + 13), new Point(cur.X + 3, cur.Y + 11));
+                 canvas.DrawLine(pen, new Point(cur.X + 4, cur.Y + 12), new Point(cur.X + 6, cur.Y + 17));
+                 canvas.DrawPoint(pen, new Point(cur.X + 6, cur.Y + 11));
+                 canvas.DrawLine(pen, new Point(cur.X + 7, cur.Y + 12), new Point(cur.X + 9, cur.Y + 17));
+                 canvas.DrawLine(pen, new Point(cur.X + 7, cur.Y + 18), new Point(cur.X + 8, cur.Y + 18));*/
+
+
+                // FontDrawer.WriteText("VGA Canvas", 50, 50, pen);
+                //   canvas.DrawFilledRectangle(pen, 150, 50, 320, 6);
+                Console.ReadKey();
+                canvas.Disable();
+                PCScreenFont screenFont = new PCScreenFont();
+                VGAScreen.SetFont(screenFont.CreateVGAFont(), screenFont.CharHeight);
+                Console.Clear();
+                Console.WriteLine("test");
+                Console.ReadLine();
+
             }
-            catch (Exception e)
+            catch
             {
-                Console.WriteLine("Exception occurred");
-                Console.WriteLine(e.ToString());
-                mDebugger.Send("Exception occurred: " + e.ToString());
-                TestController.Failed();
+
             }
         }
     }

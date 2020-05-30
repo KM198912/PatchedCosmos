@@ -12,7 +12,7 @@ namespace Cosmos.HAL.BlockDevice
 {
     public class AHCI
     {
-        internal static Debugger mAHCIDebugger = new Debugger("HAL", "AHCI");
+       // internal static Debugger mAHCIDebugger = new Debugger("HAL", "AHCI");
         internal static PCIDevice xDevice = HAL.PCI.GetDeviceClass(HAL.ClassID.MassStorageController,
                                                                    HAL.SubclassID.SATAController,
                                                                    HAL.ProgramIF.SATA_AHCI);
@@ -83,7 +83,7 @@ namespace Cosmos.HAL.BlockDevice
             {
                 if(xPort.mPortType == PortType.SATA)
                 {
-                    mAHCIDebugger.Send($"{xPort.mPortName} Port 0:{xPort.mPortNumber}");
+                 //   Console.WriteLine($"{xPort.mPortName} Port 0:{xPort.mPortNumber}");
                     var xMBRData = new byte[512];
                     xPort.ReadBlock(0UL, 1U, ref xMBRData);
                     var xMBR = new MBR(xMBRData);
@@ -91,7 +91,7 @@ namespace Cosmos.HAL.BlockDevice
                     if (xMBR.EBRLocation != 0)
                     {
                         // EBR Detected!
-                        mAHCIDebugger.Send("EBR Detected within MBR code");
+                        Console.WriteLine("EBR Detected within MBR code");
                         var xEBRData = new byte[512];
                         xPort.ReadBlock(xMBR.EBRLocation, 1U, ref xEBRData);
                         var xEBR = new EBR(xEBRData);
@@ -103,8 +103,8 @@ namespace Cosmos.HAL.BlockDevice
                         }
                     }
                     
-                    mAHCIDebugger.Send($"Number of MBR partitions found on port 0:{xPort.mPortNumber} ");
-                    mAHCIDebugger.SendNumber(xMBR.Partitions.Count);
+                    Console.WriteLine($"Number of MBR partitions found on port 0:{xPort.mPortNumber} ");
+                    Console.WriteLine(xMBR.Partitions.Count.ToString());
                     for (int i = 0; i < xMBR.Partitions.Count; i++)
                     {
                         var xPart = xMBR.Partitions[i];
@@ -116,13 +116,13 @@ namespace Cosmos.HAL.BlockDevice
                         {
                             var xPartDevice = new Partition(xPort, xPart.StartSector, xPart.SectorCount);
                             BlockDevice.Devices.Add(xPartDevice);
-                            Console.WriteLine("Found partition at idx: " + i);
+                           // Console.WriteLine("Found partition at idx: " + i);
                         }
                     }
                 }
                 else if (xPort.mPortType == PortType.SATAPI)
                 {
-                    mAHCIDebugger.Send($"{xPort.mPortName} Port 0:{xPort.mPortNumber}");
+                    Console.WriteLine($"{xPort.mPortName} Port 0:{xPort.mPortNumber}");
 
                     // Just to test Read Sector!
                     
@@ -130,8 +130,8 @@ namespace Cosmos.HAL.BlockDevice
                     //xPort.ReadBlock(0UL, 1U, xMBRData);
                     //MBR xMBR = new MBR(xMBRData);
 
-                    //mAHCIDebugger.Send($"Number of corrupted MBR partitions found on port 0:{xPort.mPortNumber} ");
-                    //mAHCIDebugger.SendNumber(xMBR.Partitions.Count);
+                    //Console.WriteLine($"Number of corrupted MBR partitions found on port 0:{xPort.mPortNumber} ");
+                    //Console.WriteLineNumber(xMBR.Partitions.Count);
                     //for (int i = 0; i < xMBR.Partitions.Count; i++)
                     //{
                     //    var xPart = xMBR.Partitions[i];
@@ -219,25 +219,25 @@ namespace Cosmos.HAL.BlockDevice
                     var xPortString = "0:" + ((xPort.ToString().Length <= 1) ? xPort.ToString().PadLeft(1, '0') : xPort.ToString());
                     if (PortType == PortType.SATA) // If Port type was SATA.
                     {
-                        mAHCIDebugger.Send("Initializing Port " + xPortString + " with type SATA");
+                        Console.WriteLine("Initializing Port " + xPortString + " with type SATA");
                         PortRebase(xPortReg, (uint)xPort);
                         var xSATAPort = new SATA(xPortReg);
                         mPorts.Add(xSATAPort);
                     }
                     else if (PortType == PortType.SATAPI) // If Port type was SATAPI.
                     {
-                        mAHCIDebugger.Send("Initializing Port " + xPortString + " with type Serial ATAPI");
-                        //PortRebase(xPortReg, (uint)xPort);
-                        //var xSATAPIPort = new SATAPI(xPortReg);
-                        //mPorts.Add(xSATAPIPort);
+                      Console.WriteLine("Initializing Port " + xPortString + " with type Serial ATAPI");
+                        PortRebase(xPortReg, (uint)xPort);
+                        var xSATAPIPort = new SATAPI(xPortReg);
+                        mPorts.Add(xSATAPIPort);
                     }
                     else if (PortType == PortType.SEMB) // If Port type was SEMB.
                     {
-                        mAHCIDebugger.Send("SEMB Drive at port " + xPortString + " found, which is not supported yet!");
+                        Console.WriteLine("SEMB Drive at port " + xPortString + " found, which is not supported yet!");
                     }
                     else if (PortType == PortType.PM) // If Port type was Port Mulitplier.
                     {
-                        mAHCIDebugger.Send("Port Multiplier Drive at port " + xPortString + " found, which is not supported yet!");
+                        Console.WriteLine("Port Multiplier Drive at port " + xPortString + " found, which is not supported yet!");
                     }
                     else if (PortType != PortType.Nothing)
                         throw new Exception("SATA Error");
@@ -274,7 +274,7 @@ namespace Cosmos.HAL.BlockDevice
 
         private void PortRebase(PortRegisters aPort, uint aPortNumber)
         {
-            mAHCIDebugger.Send("Stop");
+            Console.WriteLine("Stop");
             if (!StopCMD(aPort)) SATA.PortReset(aPort);
 
             aPort.CLB = (uint)Base.AHCI + (0x400 * aPortNumber);
@@ -294,7 +294,7 @@ namespace Cosmos.HAL.BlockDevice
             aPort.IS = 0;
             aPort.IE = 0xFFFFFFFF;
 
-            mAHCIDebugger.Send("Finished!");
+            Console.WriteLine("Finished!");
         }
 
         private static HBACommandHeader[] GetCommandHeader(PortRegisters aPort)
