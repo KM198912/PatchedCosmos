@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using Cosmos.Core;
 using Cosmos.Debug.Kernel;
 using Cosmos.HAL.BlockDevice;
+using Cosmos.HAL.Drivers.USB;
 
 namespace Cosmos.HAL
 {
@@ -16,7 +17,7 @@ namespace Cosmos.HAL
 
         public static TextScreenBase TextScreen = new TextScreen();
         public static PCI Pci;
-
+        
         private static readonly PS2Controller PS2Controller = new PS2Controller();
 
         static public void Init(TextScreenBase textScreen)
@@ -38,11 +39,13 @@ namespace Cosmos.HAL
             //TODO: Since this is FCL, its "common". Otherwise it should be
             // system level and not accessible from Core. Need to think about this
             // for the future.
-
+            Console.Clear();
             Console.WriteLine("Finding PCI Devices");
             mDebugger.Send("PCI Devices");
             PCI.Setup();
-
+            Console.WriteLine("Starting USB");
+            mDebugger.Send("USB Devices");
+            USBHost.Initialize();
             Console.WriteLine("Starting ACPI");
             mDebugger.Send("ACPI Init");
             ACPI.Start();

@@ -1,4 +1,6 @@
 #define COSMOSDEBUG
+using System;
+using System.Drawing;
 using Cosmos.HAL;
 using Cosmos.HAL.Drivers;
 
@@ -64,14 +66,20 @@ namespace Cosmos.System.Graphics
                 return new VGACanvas(mode);
             }
         }
-
-        public static Canvas GetFullScreenCanvas()
+        public static Canvas GetFullScreenCanvas(Color color,bool buffered = false)
         {
             Global.mDebugger.SendInternal($"GetFullScreenCanvas() with default mode");
             if (_VideoDriver == null)
             {
                 Global.mDebugger.SendInternal($"_VideoDriver is null creating new object");
-                _VideoDriver = GetVideoDriver();
+                if (buffered)
+                {
+                    _VideoDriver = new BasicBufferScreen(GetVideoDriver(),color);
+                }
+                else
+                {
+                    _VideoDriver = GetVideoDriver();
+                }
             }
             else
             {
@@ -81,13 +89,20 @@ namespace Cosmos.System.Graphics
             return _VideoDriver;
         }
 
-        public static Canvas GetFullScreenCanvas(Mode mode)
+        public static Canvas GetFullScreenCanvas(Mode mode,Color color,bool buffered = false)
         {
             Global.mDebugger.SendInternal($"GetFullScreenCanvas() with mode" + mode);
 
             if (_VideoDriver == null)
             {
-                _VideoDriver = GetVideoDriver(mode);
+                if (buffered)
+                {
+                    _VideoDriver = new BasicBufferScreen(GetVideoDriver(mode),color);
+                }
+                else
+                {
+                    _VideoDriver = GetVideoDriver(mode);
+                }
             }
             else
             {

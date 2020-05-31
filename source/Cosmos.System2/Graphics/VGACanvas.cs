@@ -15,7 +15,9 @@ namespace Cosmos.System.Graphics
         public VGACanvas(Mode aMode) : base()
         {
             Global.mDebugger.Send("Creating VGACanvas with mode");
-            _VGADriver = new VGADriver();
+
+                _VGADriver = new VGADriver();
+          
             _VGADriver.SetGraphicsMode(ModeToScreenSize(aMode), (VGADriver.ColorDepth)(int)aMode.ColorDepth);
             Mode = aMode;
             enabled = true;

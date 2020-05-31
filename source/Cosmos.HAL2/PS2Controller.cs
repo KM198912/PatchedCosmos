@@ -228,6 +228,7 @@ namespace Cosmos.HAL
                      */
                     if (xFirstByte == 0x00 || xFirstByte == 0x03 || xFirstByte == 0x04)
                     {
+                      
                         var xDevice = new PS2Mouse(this, aPort, xFirstByte);
                         xDevice.Initialize();
 
@@ -251,7 +252,7 @@ namespace Cosmos.HAL
                         //       https://github.com/CosmosOS/IL2CPU/issues/8
                         //
                         var xTest = (xSecondByte == 0x41 || xSecondByte == 0xC1);
-
+                
                         if (xTest && aPort == 1)
                         {
                             var xDevice = new PS2Keyboard(this, aPort);
@@ -366,8 +367,10 @@ namespace Cosmos.HAL
                         case 0x04:
                             xErrorMessage = "Data Line Stuck High";
                             break;
+                        case 0x50:
+                            return true;
                         default:
-                            throw new Exception("(PS/2 Controller) (Port " + aPort + ") Device test status unknown: " + xTestByte.ToHex());
+                          throw new Exception("(PS/2 Controller) (Port " + aPort + ") Device test status unknown: " + xTestByte.ToHex());
                     }
 
                     mDebugger.Send("(PS/2 Controller) (Port " + aPort + ") Device test error: '" + xErrorMessage + "'");
