@@ -13,8 +13,7 @@ namespace Cosmos.System.Graphics
         private Color[] Buffer;
         public BasicBufferScreen(Canvas backend,Color color)
         {
-            backend.Clear(color);
-            Backend = backend;
+                     Backend = backend;
             Buffer = new Color[Backend.Mode.Columns * Backend.Mode.Rows];
         }
 
@@ -54,7 +53,7 @@ namespace Cosmos.System.Graphics
 
         public override Color GetPointColor(int x, int y)
         {
-            return Buffer[(y * Backend.Mode.Rows) + x];
+            return Buffer[(y * Backend.Mode.Columns) + x];
         }
         public void Clear(Color color,bool buffered = false)
         {
@@ -81,7 +80,7 @@ namespace Cosmos.System.Graphics
         }
         public override void Disable()
         {
-            Disable();
+            Backend.Disable();
         }
         public void Render()
         {
@@ -89,9 +88,9 @@ namespace Cosmos.System.Graphics
             {
                 for (int x = 0; x < Backend.Mode.Columns; x++)
                 {
-                    if (GetPointColor(x, y) != Buffer[(y * Backend.Mode.Rows) + x])
+                    if (GetPointColor(x, y) != Buffer[(y * Backend.Mode.Columns) + x])
                     {
-                        Backend.DrawPoint(new Pen(Buffer[(y * Backend.Mode.Rows) + x]), x, y);
+                        Backend.DrawPoint(new Pen(Buffer[(y * Backend.Mode.Columns) + x]), x, y);
                     }
                 }
             }
