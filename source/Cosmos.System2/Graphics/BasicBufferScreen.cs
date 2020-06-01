@@ -14,7 +14,7 @@ namespace Cosmos.System.Graphics
         Color col;
         int width;
 
-        public BufferedCanvas(Mode mode, Color? color)
+        public BufferedCanvas(Mode mode, Color? color = null)
         {
             Color bufferColor = color ?? Color.Black;
             try
@@ -32,7 +32,7 @@ namespace Cosmos.System.Graphics
                 throw new Exception(e.Message);
             }
         }
-        public BufferedCanvas(Color? color)
+        public BufferedCanvas(Color? color = null)
         {
             Color bufferColor = color ?? Color.Black;
             try
@@ -130,8 +130,9 @@ namespace Cosmos.System.Graphics
             {
                 for (int x = 0; x < Backend.Mode.Columns; x++)
                 {
-                    if (GetPointColor(x, y) != Backend.GetPointColor(x, y))
+                    if (GetPointColor(x, y).ToArgb() != Backend.GetPointColor(x, y).ToArgb())
                     {
+                        //if()
                         Global.mDebugger.Send("Color = " + Buffer[(y * Backend.Mode.Rows) + x]);
                         Backend.DrawPoint(new Pen(Buffer[(y * Backend.Mode.Rows) + x]), x, y);
                     }
