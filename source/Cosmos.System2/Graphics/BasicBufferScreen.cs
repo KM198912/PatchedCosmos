@@ -9,25 +9,27 @@ namespace Cosmos.System.Graphics
     {
 
         private Canvas Backend;
-
+        private Pen BackendPen;
         private Color[] Buffer;
+        Color col;
+        int width;
 
         public BufferedCanvas(Mode mode)
         {
             try
             {
 
-                    Backend = FullScreenCanvas.GetFullScreenCanvas(mode);
+                Backend = FullScreenCanvas.GetFullScreenCanvas(mode);
 
                 Buffer = new Color[Backend.Mode.Columns * Backend.Mode.Rows];
                 Global.mDebugger.Send("DEBUG Rows: " + Backend.Mode.Rows + " Columns: " + Backend.Mode.Columns + " Color: " + Buffer.ToString());
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 Global.mDebugger.Send("CGS Crash: " + e.Message);
                 throw new Exception(e.Message);
             }
-            }
+        }
         public BufferedCanvas()
         {
             try
@@ -44,7 +46,7 @@ namespace Cosmos.System.Graphics
 
 
         public override List<Mode> AvailableModes => Backend.AvailableModes;
-        
+
         public override Mode DefaultGraphicMode => Backend.DefaultGraphicMode;
 
         public override Mode Mode
@@ -72,16 +74,18 @@ namespace Cosmos.System.Graphics
             Backend.DrawArray(colors, x, y, width, height);
 
         }
-
         public override void DrawPoint(Pen pen, int x, int y)
         {
-
+            
+            Global.mDebugger.Send("DRAWPOINT: Attempting to Draw point at X: " + x.ToString() + " Y: " + y.ToString());
             Buffer[(y * Backend.Mode.Rows) + x] = pen.Color;
 
         }
 
+
         public override void DrawPoint(Pen pen, float x, float y)
         {
+            Global.mDebugger.Send("DRAWPOINT: Attempting to Draw point at X: " + x.ToString() + " Y: " + y.ToString());
 
             DrawPoint(pen, (int)x, (int)y);
 
@@ -117,8 +121,9 @@ namespace Cosmos.System.Graphics
             {
                 for (int x = 0; x < Backend.Mode.Columns; x++)
                 {
-                    if (GetPointColor(x, y) != Buffer[(y * Backend.Mode.Rows) + x])
+                    if (GetPointColor(x, y) != Backend.GetPointColor(x, y))
                     {
+                        Global.mDebugger.Send("Color = " + Buffer[(y * Backend.Mode.Rows) + x]);
                         Backend.DrawPoint(new Pen(Buffer[(y * Backend.Mode.Rows) + x]), x, y);
                     }
                 }
