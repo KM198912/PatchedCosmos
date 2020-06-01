@@ -14,14 +14,16 @@ namespace Cosmos.System.Graphics
         Color col;
         int width;
 
-        public BufferedCanvas(Mode mode)
+        public BufferedCanvas(Mode mode, Color? color)
         {
+            Color bufferColor = color ?? Color.Black;
             try
             {
 
                 Backend = FullScreenCanvas.GetFullScreenCanvas(mode);
-
+   
                 Buffer = new Color[Backend.Mode.Columns * Backend.Mode.Rows];
+                Clear(bufferColor);
                 Global.mDebugger.Send("DEBUG Rows: " + Backend.Mode.Rows + " Columns: " + Backend.Mode.Columns + " Color: " + Buffer.ToString());
             }
             catch (Exception e)
@@ -30,12 +32,14 @@ namespace Cosmos.System.Graphics
                 throw new Exception(e.Message);
             }
         }
-        public BufferedCanvas()
+        public BufferedCanvas(Color? color)
         {
+            Color bufferColor = color ?? Color.Black;
             try
             {
                 Backend = FullScreenCanvas.GetFullScreenCanvas();
                 Buffer = new Color[Backend.Mode.Columns * Backend.Mode.Rows];
+                Clear(bufferColor);
             }
             catch (Exception e)
             {
@@ -103,7 +107,12 @@ namespace Cosmos.System.Graphics
             {
 
                 Color DefaultColor = color ?? Color.Black;
-                Backend.Clear(DefaultColor);
+ 
+                for (int i = 0; i < Buffer.Length; i++)
+                {
+                    Buffer[i] = DefaultColor;
+                }
+                    Backend.Clear(DefaultColor);
                 
             }
             catch(Exception e)
